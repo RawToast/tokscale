@@ -705,7 +705,7 @@ mod tests {
         );
         assert_eq!(
             crate::tui::client_ui::display_name(ClientId::KiloCode),
-            "KiloCode"
+            "Kilo"
         );
     }
 

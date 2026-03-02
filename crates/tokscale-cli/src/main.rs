@@ -75,7 +75,7 @@ struct Cli {
     #[arg(long, help = "Show only Roo Code usage")]
     roocode: bool,
 
-    #[arg(long, help = "Show only KiloCode usage")]
+    #[arg(long, help = "Show only Kilo usage")]
     kilocode: bool,
 
     #[arg(long, help = "Show only today's usage")]
@@ -143,7 +143,7 @@ enum Commands {
         qwen: bool,
         #[arg(long, help = "Show only Roo Code usage")]
         roocode: bool,
-        #[arg(long, help = "Show only KiloCode usage")]
+        #[arg(long, help = "Show only Kilo usage")]
         kilocode: bool,
         #[arg(long, help = "Show only today's usage")]
         today: bool,
@@ -199,7 +199,7 @@ enum Commands {
         qwen: bool,
         #[arg(long, help = "Show only Roo Code usage")]
         roocode: bool,
-        #[arg(long, help = "Show only KiloCode usage")]
+        #[arg(long, help = "Show only Kilo usage")]
         kilocode: bool,
         #[arg(long, help = "Show only today's usage")]
         today: bool,
@@ -267,7 +267,7 @@ enum Commands {
         qwen: bool,
         #[arg(long, help = "Show only Roo Code usage")]
         roocode: bool,
-        #[arg(long, help = "Show only KiloCode usage")]
+        #[arg(long, help = "Show only Kilo usage")]
         kilocode: bool,
         #[arg(long, help = "Show only today's usage")]
         today: bool,
@@ -312,7 +312,7 @@ enum Commands {
         qwen: bool,
         #[arg(long, help = "Show only Roo Code usage")]
         roocode: bool,
-        #[arg(long, help = "Show only KiloCode usage")]
+        #[arg(long, help = "Show only Kilo usage")]
         kilocode: bool,
         #[arg(long, help = "Show only today's usage")]
         today: bool,
@@ -353,7 +353,7 @@ enum Commands {
         qwen: bool,
         #[arg(long, help = "Show only Roo Code usage")]
         roocode: bool,
-        #[arg(long, help = "Show only KiloCode usage")]
+        #[arg(long, help = "Show only Kilo usage")]
         kilocode: bool,
         #[arg(long, help = "Submit only today's usage")]
         today: bool,
@@ -416,7 +416,7 @@ enum Commands {
         qwen: bool,
         #[arg(long, help = "Show only Roo Code usage")]
         roocode: bool,
-        #[arg(long, help = "Show only KiloCode usage")]
+        #[arg(long, help = "Show only Kilo usage")]
         kilocode: bool,
         #[arg(
             long,
