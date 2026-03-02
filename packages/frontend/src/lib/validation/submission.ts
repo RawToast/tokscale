@@ -31,6 +31,8 @@ const SUPPORTED_SOURCES = [
   "pi",
   "kimi",
   "qwen",
+  "roocode",
+  "kilocode",
   "synthetic",
 ] as const;
 const SourceSchema = z.enum(SUPPORTED_SOURCES);

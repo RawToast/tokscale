@@ -36,6 +36,8 @@ export const SOURCE_DISPLAY_NAMES: Record<string, string> = {
   pi: "Pi",
   kimi: "Kimi",
   qwen: "Qwen",
+  roocode: "Roo Code",
+  kilocode: "KiloCode",
   synthetic: "Synthetic",
 };
 
@@ -53,6 +55,8 @@ export const SOURCE_LOGOS: Record<string, string> = {
   pi: `${GITHUB_CDN_BASE}/client-pi.png`,
   kimi: `${GITHUB_CDN_BASE}/client-kimi.png`,
   qwen: `${GITHUB_CDN_BASE}/client-qwen.png`,
+  roocode: `${GITHUB_CDN_BASE}/client-roocode.png`,
+  kilocode: `${GITHUB_CDN_BASE}/client-kilocode.png`,
   synthetic: `${GITHUB_CDN_BASE}/client-synthetic.png`,
 };
 
@@ -68,6 +72,8 @@ export const SOURCE_COLORS: Record<string, string> = {
   pi: "#6366F1",
   kimi: "#8B5CF6",
   qwen: "#1A73E8",
+  roocode: "#10B981",
+  kilocode: "#F59E0B",
   synthetic: "#4ADE80",
 };
 
