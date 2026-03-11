@@ -149,11 +149,15 @@ impl DataLoader {
             year: self.year.clone(),
         };
 
-        let messages = if let Ok(handle) = Handle::try_current() {
+        let messages = if Handle::try_current().is_ok() {
             std::thread::scope(|s| {
-                s.spawn(|| handle.block_on(parse_local_unified_messages(opts)))
-                    .join()
-                    .expect("data loader thread panicked")
+                s.spawn(|| {
+                    Runtime::new()
+                        .expect("failed to create tokio runtime")
+                        .block_on(parse_local_unified_messages(opts))
+                })
+                .join()
+                .expect("data loader thread panicked")
             })
         } else {
             Runtime::new()?.block_on(parse_local_unified_messages(opts))
