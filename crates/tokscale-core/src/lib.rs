@@ -562,20 +562,25 @@ fn parse_all_messages_with_pricing(
                     .collect();
             all_messages.extend(synthetic_messages);
         }
+    }
 
+    // Filter BEFORE normalization so retain_for_requested_clients can see
+    // original model/provider prefixes (e.g. "accounts/fireworks/models/…")
+    // that is_synthetic_gateway relies on for gateway detection.
+    if !include_all {
+        let requested: HashSet<&str> = clients.iter().map(String::as_str).collect();
+        all_messages.retain(|msg| {
+            retain_for_requested_clients(&msg.client, &msg.model_id, &msg.provider_id, &requested)
+        });
+    }
+
+    if include_synthetic {
         for msg in &mut all_messages {
             sessions::synthetic::normalize_synthetic_gateway_fields(
                 &mut msg.model_id,
                 &mut msg.provider_id,
             );
         }
-    }
-
-    if !include_all {
-        let requested: HashSet<&str> = clients.iter().map(String::as_str).collect();
-        all_messages.retain(|msg| {
-            retain_for_requested_clients(&msg.client, &msg.model_id, &msg.provider_id, &requested)
-        });
     }
 
     all_messages
@@ -1148,20 +1153,23 @@ pub fn parse_local_clients(options: LocalParseOptions) -> Result<ParsedMessages,
                     .collect();
             messages.extend(synthetic_msgs);
         }
+    }
 
+    // Filter BEFORE normalization (see parse_all_messages_with_pricing).
+    if !include_all {
+        let requested: HashSet<&str> = clients.iter().map(String::as_str).collect();
+        messages.retain(|msg| {
+            retain_for_requested_clients(&msg.client, &msg.model_id, &msg.provider_id, &requested)
+        });
+    }
+
+    if include_synthetic {
         for msg in &mut messages {
             sessions::synthetic::normalize_synthetic_gateway_fields(
                 &mut msg.model_id,
                 &mut msg.provider_id,
             );
         }
-    }
-
-    if !include_all {
-        let requested: HashSet<&str> = clients.iter().map(String::as_str).collect();
-        messages.retain(|msg| {
-            retain_for_requested_clients(&msg.client, &msg.model_id, &msg.provider_id, &requested)
-        });
     }
 
     let filtered = filter_parsed_messages(messages, &options);
@@ -1588,6 +1596,68 @@ mod tests {
 
         assert_eq!(parsed.counts.get(ClientId::OpenCode), 1);
         assert_eq!(parsed.messages.len(), 1);
+        assert_eq!(parsed.messages[0].client, "opencode");
+        assert_eq!(parsed.messages[0].model_id, "deepseek-v3-0324");
+        assert_eq!(parsed.messages[0].provider_id, "fireworks");
+    }
+
+    #[test]
+    fn test_parse_all_messages_fireworks_provider_kept_under_synthetic_only_filter() {
+        let temp_dir = tempfile::TempDir::new().unwrap();
+        let message_dir = temp_dir
+            .path()
+            .join(".local/share/opencode/storage/message/project-1");
+        std::fs::create_dir_all(&message_dir).unwrap();
+        std::fs::write(
+            message_dir.join("msg_001.json"),
+            r#"{"id":"msg-1","sessionID":"session-1","role":"assistant","modelID":"accounts/fireworks/models/deepseek-v3-0324","providerID":"fireworks","cost":0.1,"tokens":{"input":10,"output":5,"reasoning":0,"cache":{"read":0,"write":0}},"time":{"created":1733011200000}}"#,
+        )
+        .unwrap();
+
+        let pricing = pricing::PricingService::new(HashMap::new(), HashMap::new());
+        let messages = parse_all_messages_with_pricing(
+            temp_dir.path().to_str().unwrap(),
+            &["synthetic".to_string()],
+            Some(&pricing),
+        );
+
+        assert_eq!(
+            messages.len(),
+            1,
+            "fireworks gateway message must not be dropped when filtering for synthetic"
+        );
+        assert_eq!(messages[0].client, "opencode");
+        assert_eq!(messages[0].model_id, "deepseek-v3-0324");
+        assert_eq!(messages[0].provider_id, "fireworks");
+    }
+
+    #[test]
+    fn test_parse_local_clients_fireworks_provider_kept_under_synthetic_only_filter() {
+        let temp_dir = tempfile::TempDir::new().unwrap();
+        let message_dir = temp_dir
+            .path()
+            .join(".local/share/opencode/storage/message/project-1");
+        std::fs::create_dir_all(&message_dir).unwrap();
+        std::fs::write(
+            message_dir.join("msg_001.json"),
+            r#"{"id":"msg-1","sessionID":"session-1","role":"assistant","modelID":"accounts/fireworks/models/deepseek-v3-0324","providerID":"fireworks","cost":0.1,"tokens":{"input":10,"output":5,"reasoning":0,"cache":{"read":0,"write":0}},"time":{"created":1733011200000}}"#,
+        )
+        .unwrap();
+
+        let parsed = parse_local_clients(LocalParseOptions {
+            home_dir: Some(temp_dir.path().to_str().unwrap().to_string()),
+            clients: Some(vec!["synthetic".to_string()]),
+            since: None,
+            until: None,
+            year: None,
+        })
+        .unwrap();
+
+        assert_eq!(
+            parsed.messages.len(),
+            1,
+            "fireworks gateway message must not be dropped when filtering for synthetic only"
+        );
         assert_eq!(parsed.messages[0].client, "opencode");
         assert_eq!(parsed.messages[0].model_id, "deepseek-v3-0324");
         assert_eq!(parsed.messages[0].provider_id, "fireworks");
