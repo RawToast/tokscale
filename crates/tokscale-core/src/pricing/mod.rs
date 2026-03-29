@@ -443,6 +443,35 @@ mod tests {
     }
 
     #[test]
+    fn test_cursor_calculate_cost_composer_2_fast_cache_write_free() {
+        let service = PricingService::new(HashMap::new(), HashMap::new());
+        let with_write = service.calculate_cost("composer-2-fast", 0, 0, 0, 500_000, 0);
+        let without_write = service.calculate_cost("composer-2-fast", 0, 0, 0, 0, 0);
+        assert!(
+            (with_write - without_write).abs() < 1e-10,
+            "Cache creation should be free for Composer 2 Fast"
+        );
+    }
+
+    #[test]
+    fn test_cursor_composer_lookup_case_insensitive() {
+        let service = PricingService::new(HashMap::new(), HashMap::new());
+
+        let lower = service.lookup_with_source("composer 1", None);
+        let upper = service.lookup_with_source("COMPOSER 1", None);
+        let mixed = service.lookup_with_source("Composer 1", None);
+
+        assert!(lower.is_some(), "lowercase should resolve");
+        assert!(upper.is_some(), "UPPERCASE should resolve");
+        assert!(mixed.is_some(), "Mixed Case should resolve");
+
+        assert_eq!(
+            lower.unwrap().pricing.input_cost_per_token,
+            upper.unwrap().pricing.input_cost_per_token
+        );
+    }
+
+    #[test]
     fn test_from_cached_datasets_returns_none_when_both_sources_missing() {
         assert!(PricingService::from_cached_datasets(None, None).is_none());
     }
