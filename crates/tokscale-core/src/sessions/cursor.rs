@@ -59,7 +59,10 @@ fn parse_cost(cost_str: &str) -> f64 {
     let trimmed = cleaned.trim();
 
     // Handle empty, NaN, or non-numeric values (e.g., "Included", "-" in v3)
-    if trimmed.is_empty() || trimmed.eq_ignore_ascii_case("nan") || !trimmed.chars().any(|c| c.is_ascii_digit()) {
+    if trimmed.is_empty()
+        || trimmed.eq_ignore_ascii_case("nan")
+        || !trimmed.chars().any(|c| c.is_ascii_digit())
+    {
         return 0.0;
     }
 
