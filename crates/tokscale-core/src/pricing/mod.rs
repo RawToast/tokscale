@@ -473,7 +473,9 @@ mod tests {
     #[test]
     fn test_cursor_returns_pricing_for_composer_2_5_fast() {
         let service = PricingService::new(HashMap::new(), HashMap::new());
-        let result = service.lookup_with_source("composer-2.5-fast", None).unwrap();
+        let result = service
+            .lookup_with_source("composer-2.5-fast", None)
+            .unwrap();
         assert_eq!(result.source, "Cursor");
         assert_eq!(result.matched_key, "composer-2.5-fast");
         assert_eq!(result.pricing.input_cost_per_token, Some(1.5e-6));
